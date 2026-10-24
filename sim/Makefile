@@ -18,10 +18,16 @@ VFLAGS = --cc --exe --build -O3 -j 0 --top-module sim_top -I. -I.. \
          -Wno-TIMESCALEMOD -Wno-COMBDLY -Wno-CASEX -Wno-UNOPTFLAT -Wno-BLKSEQ \
          -CFLAGS -O2
 
-$(OBJ)/Vsim_top: $(SRC) sim_main.cpp
+all: $(OBJ)/Vsim_top
+
+# the build date define Quartus' flow generates; not kept in git
+../build_id.v:
+	echo '`define BUILD_DATE "$(shell date +%y%m%d)"' > $@
+
+$(OBJ)/Vsim_top: ../build_id.v $(SRC) sim_main.cpp
 	verilator $(VFLAGS) $(XINIT) --Mdir $(OBJ) $(SRC) sim_main.cpp
 
 clean:
 	rm -rf obj_dir obj_dir_rand *.ppm
 
-.PHONY: clean
+.PHONY: all clean
